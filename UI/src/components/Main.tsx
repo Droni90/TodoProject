@@ -11,24 +11,26 @@ import GroupsList from "./GroupsList";
 import { useDispatch } from "react-redux";
 import { useTypeSelector } from "../hooks/useTypeSelector";
 import { addGroup } from "../redux/actions/group";
+import DeadlineList from "./DeadlineList";
 
 const useStyles = makeStyles({
   roof: {
     display: "flex",
-    flexDirection: "column",
     justifyContent: "space-between",
-    alignItems: "center",
     height: "100%",
+    padding: "0 50px",
+    position: "relative"
   },
   button: {
     backgroundColor: "#96e395",
     height: "40px",
-    maxWidth: "100%",
+    width: "200px",
   },
   form: {
     display: "flex",
     flexDirection: "column",
-    width: "200px",
+    alignItems: "center",
+    width: "100%",
   },
   input: {
     marginBottom: "15px",
@@ -47,12 +49,24 @@ const useStyles = makeStyles({
   error: {
     color: "red",
   },
+  deadlineBox: {
+    width: "800px",
+    height: "500px",
+    border: "1px solid black",
+    borderRadius: "20px",
+    boxSizing: "border-box",
+    boxShadow: "3px 2px rgba(55,55,55,.4 )"
+  },
+  text: {
+    fontSize: "32px",
+    textAlign: "center"
+  }
 });
 
 interface IMain {
-  handleGroupClick: (id: number) => void;
-  handleRemoveGroup: (evt: React.SyntheticEvent, id: number) => void;
-  handleOpenColorModal: (evt: React.SyntheticEvent, groupId: number) => void;
+  handleGroupClick: (id: string) => void;
+  handleRemoveGroup: (evt: React.SyntheticEvent, id: string) => void;
+  handleOpenColorModal: (evt: React.SyntheticEvent, groupId: string) => void;
 }
 
 const Main: React.FC<IMain> = ({
@@ -81,7 +95,7 @@ const Main: React.FC<IMain> = ({
   return (
     <Container className={classes.roof}>
       <Box className={classes.box}>
-        <h1>ToDo groups</h1>
+        <h1 className={classes.text}>ToDo groups</h1>
         {todoGroups.length ? (
           <GroupsList
             handleGroupClick={handleGroupClick}
@@ -91,24 +105,29 @@ const Main: React.FC<IMain> = ({
         ) : (
           <h2 className={classes.subtitle}>У вас нет дел</h2>
         )}
+         <form className={classes.form} onSubmit={handleAddGroupSubmit}>
+          <OutlinedInput
+            id="component-outlined"
+            value={inputValue}
+            onChange={handleInput}
+            className={classes.input}
+            required={true}
+          />
+          <Button
+            className={classes.button}
+            variant="outlined"
+            size="small"
+            type="submit"
+          >
+            Create
+          </Button>
+        </form>
       </Box>
-      <form className={classes.form} onSubmit={handleAddGroupSubmit}>
-        <OutlinedInput
-          id="component-outlined"
-          value={inputValue}
-          onChange={handleInput}
-          className={classes.input}
-          required={true}
-        />
-        <Button
-          className={classes.button}
-          variant="outlined"
-          size="small"
-          type="submit"
-        >
-          Create
-        </Button>
-      </form>
+     
+      <Box className={classes.deadlineBox}>
+        <h2 className={classes.text}>Список срочных дел</h2>
+          <DeadlineList />
+      </Box>
     </Container>
   );
 };

@@ -4,6 +4,7 @@ import { ActionType, getType } from "typesafe-actions";
 
 const initialState: IGroupsState = {
   todoGroups: [],
+  urgentTodos: [],
 };
 
 export const groupsList = (
@@ -54,9 +55,16 @@ export const groupsList = (
         error: "",
       };
 
+      case getType(todoActions.loadUrgentTodosSuccess):
+        return {
+          ...state,
+          urgentTodos: action.payload,
+          error: "",
+        };
+
     case getType(todoActions.addTodoSuccess):
       newGroups = state.todoGroups.map((item) => {
-        if (item.id === +action.payload.id) {
+        if (item.id === action.payload.id) {
           item.todoItems?.push(action.payload.model);
           item.totalCount += 1;
         }
@@ -67,7 +75,7 @@ export const groupsList = (
     case getType(todoActions.removeTodoSuccess):
       console.log(action);
       newGroups = [...state.todoGroups].map((item) => {
-        if (item.id === +action.payload.groupId) {
+        if (item.id === action.payload.groupId) {
           console.log("xxx");
           item.totalCount -= 1;
           item.todoItems?.forEach((todo) => {
@@ -96,6 +104,35 @@ export const groupsList = (
         return item;
       });
       return { ...state, todoGroups: newGroups, error: "" };
+
+      case getType(todoActions.changePriorityTodoSuccess):
+      newGroups = [...state.todoGroups].map((item) => {
+        item.todoItems?.forEach((todo: ITodoModel) => {
+          if (todo.id === action.payload.todoId) {
+            todo.priority = action.payload.priority;
+          }
+        });
+        return item;
+      });
+      return { ...state, todoGroups: newGroups, error: "" };
+
+      case getType(todoActions.changeDeadlineTodoSuccess):
+      newGroups = [...state.todoGroups].map((item) => {
+        item.todoItems?.forEach((todo: ITodoModel) => {
+          if (todo.id === action.payload.todoId) {
+            todo.deadline = action.payload.deadline;
+          }
+        });
+        return item;
+      });
+      return { ...state, todoGroups: newGroups, error: "" };
+
+      case getType(todoActions.loadPrioritiesSuccess):
+        return {
+          ...state,
+          priorities: action.payload,
+          error: "",
+        };
 
     case getType(todoActions.spinnerStart):
       return { ...state, isLoading: true };

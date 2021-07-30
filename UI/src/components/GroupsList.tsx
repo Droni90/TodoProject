@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(() => ({
   root: {
+    display: "grid",
     width: "100%",
     maxWidth: "760px",
     backgroundColor: "inherit",
@@ -28,15 +29,16 @@ const useStyles = makeStyles(() => ({
   },
   text: {
     fontSize: "45px",
+    height: "100%"
   },
   brush: {
     marginRight: "10px",
   },
 }));
 interface IGroupsList {
-  handleGroupClick: (id: number) => void;
-  handleRemoveGroup: (evt: React.SyntheticEvent, id: number) => void;
-  handleOpenColorModal: (evt: React.SyntheticEvent, groupId: number) => void;
+  handleGroupClick: (id: string) => void;
+  handleRemoveGroup: (evt: React.SyntheticEvent, id: string) => void;
+  handleOpenColorModal: (evt: React.SyntheticEvent, groupId: string) => void;
 }
 const GroupsList: React.FC<IGroupsList> = ({
   handleRemoveGroup,
@@ -45,7 +47,6 @@ const GroupsList: React.FC<IGroupsList> = ({
 }) => {
   const classes = useStyles();
   const todoGroups = useTypeSelector((state) => state.groupsList.todoGroups);
-
   return (
     <List className={classes.root}>
       {todoGroups.map(
