@@ -10,14 +10,16 @@
       "test": "echo \"No tests yet...\""
    },
    "dependencies": {
-      "mongodb": "^3.5.5",
+      "@typegoose/typegoose": "^8.1.0",
+      "mongodb": "^3.6.10",
+      "mongoose": "^5.13.5",
       "reflect-metadata": "^0.1.10",
-      "typeorm": "^0.2.24"
+      "typeorm": "^0.2.24",
+      "typescript": "^4.3.5"
    },
    "devDependencies": {
       "@azure/functions": "^1.2.3",
       "@types/node": "^13.11.1",
-      "ts-node": "3.3.0",
-      "typescript": "^3.8.3"
+      "ts-node": "3.3.0"
    }
 }

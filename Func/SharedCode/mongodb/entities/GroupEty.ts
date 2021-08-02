@@ -1,17 +1,15 @@
-import {Entity, ObjectIdColumn, ObjectID, Column} from "typeorm";
+import { prop } from "@typegoose/typegoose";
+import { ObjectID } from "mongodb";
+import * as Mongoose from "mongoose"
 
-@Entity('Group')
 export class GroupEty {
 
-    @ObjectIdColumn()
-    id: ObjectID;
+    @prop()
+    public groupName: string;
 
-    @Column()
-    groupName: string;
+    @prop()
+    public color: string;
 
-    @Column()
-    color: string;
-
-    @Column()
-    isDeleted: boolean;
+    @prop()
+    public isDeleted: boolean;
 }

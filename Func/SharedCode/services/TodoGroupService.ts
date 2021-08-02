@@ -1,40 +1,37 @@
 import { TodoGroupModel } from "../models/TodoGroupModel";
-import { createMongoConnection } from "../mongodb";
 import { TodoGroupEty } from "../mongodb/entities/TodoGroupEty";
-import { ObjectId } from "mongodb";
-
+import { connect } from "../mongodb/index";
+import * as Mongoose from 'mongoose'
 import * as mapper from "../mappers/TodoGroupMapper";
 import { TodoItemService } from "./TodoItemService";
+
+import { getModelForClass } from "@typegoose/typegoose";
 
 export class TodoGroupService {
 
   constructor() {
+    connect();
   }
 
   public async addTodoGroup(group:TodoGroupModel): Promise<TodoGroupModel> {
-  
-    const ety = new TodoGroupEty();
+    const ety = new TodoGroupEty()
+    const TodoGroupModel = getModelForClass(TodoGroupEty);
 
     const todoGroupEty = mapper.mapToEntity(group, ety);
-  
-    const connection = await createMongoConnection();
-    const repository = connection.getMongoRepository(TodoGroupEty);
+    const { _id: id } = await TodoGroupModel.create(todoGroupEty);
 
-    const insertResult = await repository.insertOne(todoGroupEty);
-
-    const todoGroupNew = await repository.findOne({ where: { _id: new ObjectId(insertResult.insertedId) }});
-    return mapper.mapToModel(todoGroupNew);
+    const todoGroupNew = await TodoGroupModel.findById(id);
+    const model = mapper.mapToModel(todoGroupNew);
+    return {...model, _id: id}
   }
 
   public async getTodoGroups(): Promise<TodoGroupModel[]> {
+    const TodoGroupModel = getModelForClass(TodoGroupEty);
 
-    
-    const connection = await createMongoConnection();
-    const repository = connection.getMongoRepository(TodoGroupEty);
     const aggregate: Array<TodoGroupModel> = [];
-    const res = await repository.aggregate(aggregate).toArray();
+    const res = await TodoGroupModel.aggregate(aggregate)
     const todoItems =  new TodoItemService();
-
+ 
     return await Promise.all(res.filter(groups => groups.isDeleted === false).map(async group => {
           
           const model = mapper.mapToModel(group)
@@ -47,13 +44,10 @@ export class TodoGroupService {
   }
 
   public async deleteTodoGroup(id: string): Promise<TodoGroupModel> {
-    
-    const connection = await createMongoConnection();
-    const repository = connection.getMongoRepository(TodoGroupEty);
+    const TodoGroupModel = getModelForClass(TodoGroupEty);
     try {
-      const ety = await repository.findOne({ where: { _id: new ObjectId(id) }});
+      const ety = await TodoGroupModel.findOne({ where: { _id: new Mongoose.Types.ObjectId(id) }});
       ety.isDeleted = true;
-      await repository.save(ety);
       return mapper.mapToModel(ety)
     } catch (error) {
       console.error("TodoGroupService.deleteTodoGroup error", error);
@@ -61,25 +55,19 @@ export class TodoGroupService {
     }
   }
   public async getTodoGroup(): Promise<any> {
-    const ety = new GroupEty();
-    
-  
-    const connection = await createMongoConnection();
-    const repository = connection.getMongoRepository(GroupEty);
+    const TodoGroupModel = getModelForClass(TodoGroupEty);
     let aggregate: Array<any> = [];
-    const res = await repository.aggregate(aggregate).toArray();
+    const res = await TodoGroupModel.aggregate(aggregate);
   
     return res;
   }
 
   public async changeColorTodoGroup(id: string, color: string): Promise<TodoGroupModel> {
     
-    const connection = await createMongoConnection();
-    const repository = connection.getMongoRepository(TodoGroupEty);
+    const TodoGroupModel = getModelForClass(TodoGroupEty);
     try {
-      const ety = await repository.findOne({ where: { _id: new ObjectId(id) }});
+      const ety = await TodoGroupModel.findOne({ where: { _id: new Mongoose.Types.ObjectId(id) }});
       ety.color = color;
-      await repository.save(ety);
       return mapper.mapToModel(ety);
     } catch (error) {
       console.error("TodoGroupService.ChangeColorTodoGroup error", error);

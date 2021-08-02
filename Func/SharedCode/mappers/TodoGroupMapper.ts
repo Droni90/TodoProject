@@ -9,11 +9,10 @@ export const mapToEntity = (todoGroupModel: TodoGroupModel, todoGroupEty: TodoGr
     return todoGroupEty;
 }
 
-export const mapToModel = (todoGroupEty: TodoGroupEty): TodoGroupModel => {
+export const mapToModel = (todoGroupEty: TodoGroupEty ): TodoGroupModel => {
     const model:TodoGroupModel = {
         groupName: todoGroupEty.groupName,
         color: todoGroupEty.color,
-        id: todoGroupEty._id.toString(),
         completedCount: 0,
         totalCount: 0
     } 

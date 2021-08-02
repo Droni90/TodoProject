@@ -1,18 +1,14 @@
-import {Entity, ObjectIdColumn, Column} from "typeorm";
-import {ObjectId } from 'mongodb';
+import { prop } from "@typegoose/typegoose";
+import { ObjectID } from "mongodb";
+import * as Mongoose from "mongoose"
 
-@Entity('todoGroups')
 export class TodoGroupEty {
+    @prop()
+    public groupName: string;
 
-    @ObjectIdColumn({ name: "_id" })
-    _id: ObjectId;
+    @prop()
+    public color: string;
 
-    @Column()
-    groupName: string;
-
-    @Column()
-    color: string;
-
-    @Column()
-    isDeleted: boolean;
+    @prop()
+    public isDeleted: boolean;
 }

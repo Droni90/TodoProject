@@ -1,27 +1,26 @@
-import {Entity, ObjectIdColumn, Column } from "typeorm";
-import {ObjectId } from 'mongodb';
+import { prop } from "@typegoose/typegoose";
+import * as Mongoose from "mongoose"
 
-@Entity('todoItems')
 export class TodoItemEty {
 
-    @ObjectIdColumn({ name: "_id" })
-    _id: ObjectId;
+    @prop()
+    public _id: Mongoose.Schema.Types.ObjectId;
 
-    @Column()
-    todoName: string;
+    @prop()
+    public todoName: string;
 
-    @Column()
-    isCompleted: boolean;
+    @prop()
+    public isCompleted: boolean;
 
-    @Column()
-    groupId: string;
+    @prop()
+    public groupId: string;
 
-    @Column()
-    priority: string;
+    @prop()
+    public priority: string;
 
-    @Column()
-    deadline: Date;
+    @prop()
+    public deadline: Date;
 
-    @Column()
-    expired: boolean;
+    @prop()
+    public expired: boolean;
 }
