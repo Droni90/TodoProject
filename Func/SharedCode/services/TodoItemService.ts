@@ -5,36 +5,41 @@ import { TodoItemEty } from "../mongodb/entities";
 import { TodoItemModel } from "../models/TodoItemModel";
 import { PriorityEnm } from "../models/Enums/PriorityEnm";
 import { getModelForClass } from "@typegoose/typegoose";
+import { connect } from "../mongodb";
 
 export class TodoItemService {
 
   constructor() {
+    connect()
   }
 
   public async addTodoItem(itemModel:TodoItemModel, groupId: string): Promise<TodoItemModel> {
       
     const ety = new TodoItemEty();
-    const TodoGroupModel = getModelForClass(TodoItemEty);
+    const TodoItemModel = getModelForClass(TodoItemEty);
     const todoItemEty = mapper.mapToEntity(itemModel, ety);
     todoItemEty.groupId = groupId
     
-    const insertResult = await TodoGroupModel.create(todoItemEty);
-    const todoItemNew = await TodoGroupModel.findOne({ where: { _id: insertResult._id }});
-    return mapper.mapToModel(todoItemNew);
+    const insertResult = await TodoItemModel.create(todoItemEty);
+    const todoItemNew = await TodoItemModel.findOne({ _id: insertResult._id });
+    const model = mapper.mapToModel(todoItemNew);
+    return {...model, id: todoItemNew._id}
   }
 
-  public async getTodoItems(groupId: String): Promise<TodoItemModel[]> {
+  public async getTodoItems(groupId: string): Promise<TodoItemModel[]> {
     
-    const TodoGroupModel = getModelForClass(TodoItemEty);
-    const aggregate: Array<TodoItemModel> = [];
-    const res = await TodoGroupModel.aggregate(aggregate);
-    return res.filter(item => item.groupId === groupId).map(item => mapper.mapToModel(item))
+    const TodoItemModel = getModelForClass(TodoItemEty);
+    const res = await TodoItemModel.find({ groupId });
+    return res.map(item => {
+      const model = mapper.mapToModel(item)
+      return {...model, id: item._id}
+    })
   }
 
   public async deleteTodoItem(id: string): Promise<void> {
-    const TodoGroupModel = getModelForClass(TodoItemEty);
+    const TodoItemModel = getModelForClass(TodoItemEty);
     try {
-     await TodoGroupModel.deleteOne({where: {_id: new Mongoose.Types.ObjectId(id)}});
+     await TodoItemModel.deleteOne({_id: new Mongoose.Types.ObjectId(id)});
     } catch (error) {
       console.error("TodoGroupService.deleteTodoGroup error", error);
       throw error;
@@ -43,11 +48,13 @@ export class TodoItemService {
 
   public async changeCompletedStatus(id: string): Promise<TodoItemModel> {
     
-    const TodoGroupModel = getModelForClass(TodoItemEty);
+    const TodoItemModel = getModelForClass(TodoItemEty);
     try {
-      const ety = await TodoGroupModel.findOne({ where: { _id: new Mongoose.Types.ObjectId(id) }});
+      const ety = await TodoItemModel.findOne( { _id: new Mongoose.Types.ObjectId(id) });
       ety.isCompleted = !ety.isCompleted;
-      return mapper.mapToModel(ety);
+      ety.save()
+      const model = mapper.mapToModel(ety);
+      return {...model, id: ety._id}
     } catch (error) {
       console.error("TodoGroupService.ChangeColorTodoGroup error", error);
       throw error;
@@ -56,11 +63,13 @@ export class TodoItemService {
 
   public async changeDeadline(id: string,newDeadline: Date): Promise<TodoItemModel> {
     
-    const TodoGroupModel = getModelForClass(TodoItemEty);
+    const TodoItemModel = getModelForClass(TodoItemEty);
     try {
-      const ety = await TodoGroupModel.findOne({ where: { _id: new Mongoose.Types.ObjectId(id) }});
+      const ety = await TodoItemModel.findOne({ _id: new Mongoose.Types.ObjectId(id) });
       ety.deadline = newDeadline;
-      return mapper.mapToModel(ety);
+      ety.save()
+      const model = mapper.mapToModel(ety);
+      return {...model, id: ety._id}
     } catch (error) {
       console.error("TodoGroupService.ChangeColorTodoGroup error", error);
       throw error;
@@ -74,15 +83,39 @@ export class TodoItemService {
 
   public async changePriorityStatus(id: string, priority: string): Promise<TodoItemModel> {
     
-    const TodoGroupModel = getModelForClass(TodoItemEty);
+    const TodoItemModel = getModelForClass(TodoItemEty);
     try {
-      const ety = await TodoGroupModel.findOne({ where: { _id: new ObjectId(id) }});
+      const ety = await TodoItemModel.findOne( { _id: new ObjectId(id) });
       ety.priority = priority
-      return mapper.mapToModel(ety);
+      ety.save()
+      const model = mapper.mapToModel(ety);
+      return {...model, id: ety._id}
     } catch (error) {
       console.error("TodoGroupService.ChangeColorTodoGroup error", error);
       throw error;
     }
+  }
+
+  public async getUrgentTodoItems(count: number): Promise<TodoItemModel[]> {
+    const TodoItemModel = getModelForClass(TodoItemEty);
+    const res = await TodoItemModel.aggregate([
+      {
+        $match: {
+          isCompleted: false,
+        }
+      },
+      {
+        $sort: {
+          deadline: 1, 
+        }
+      },
+      {
+        $limit: count,
+      }] );
+    return res.map(todo => {
+      const model = mapper.mapToModel(todo)
+      return {...model, id: todo._id}
+    })
   }
 }
 

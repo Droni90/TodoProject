@@ -2,10 +2,6 @@ import { prop } from "@typegoose/typegoose";
 import * as Mongoose from "mongoose"
 
 export class TodoItemEty {
-
-    @prop()
-    public _id: Mongoose.Schema.Types.ObjectId;
-
     @prop()
     public todoName: string;
 

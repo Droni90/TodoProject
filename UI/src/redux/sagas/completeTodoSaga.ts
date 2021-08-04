@@ -12,6 +12,7 @@ function* completeTodo(action: ReturnType<typeof todoActions.completeTodo>) {
   yield put(spinnerStart());
   try {
     const { data } = yield call(api.completeTodo, action.payload);
+    yield put(todoActions.loadUrgentTodos(5))
     yield put(todoActions.completeTodoSuccess(data.id));
   } catch (err) {
     yield put(getError(err.message));

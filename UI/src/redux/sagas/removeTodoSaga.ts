@@ -19,6 +19,7 @@ function* removeTodo(action: ReturnType<typeof todoActions.removeTodo>) {
         todoId: action.payload.todoId,
       })
     );
+    yield put(todoActions.loadUrgentTodos(5))
   } catch (err) {
     yield put(getError(err.message));
   } finally {

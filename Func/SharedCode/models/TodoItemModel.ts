@@ -1,7 +1,7 @@
 import { PriorityEnm } from "./Enums/PriorityEnm";
 
 export interface TodoItemModel {
-  id: string;
+  id?: string;
   groupId: string;
   isCompleted: boolean;
   todoName: string;
